@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import TaskManager from '../components/TaskManager';
 export default function Home() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
@@ -31,6 +31,7 @@ export default function Home() {
     <div>
       <h1>Todo List</h1>
       <div>
+      
         <input
           type="text"
           placeholder="New task..."
@@ -39,6 +40,10 @@ export default function Home() {
         />
         <button onClick={addTask}>Add</button>
       </div>
+      <div>
+      <h1>Task Manager</h1>
+      <TaskManager />
+    </div>
       <ul>
         {tasks.map((task) => (
           <li key={task._id}>{task.text}</li>
