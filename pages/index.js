@@ -1,71 +1,49 @@
-// pages/index.js
 import { useState, useEffect } from 'react';
-import Task from '../components/Task';
 
-const Home = () => {
+export default function Home() {
   const [tasks, setTasks] = useState([]);
-  const [newTaskText, setNewTaskText] = useState('');
-
-  const fetchTasks = async () => {
-    try {
-      const response = await fetch('/api/tasks');
-      if (response.ok) {
-        const data = await response.json();
-        setTasks(data);
-      } else {
-        console.error('Failed to fetch tasks');
-      }
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-    }
-  };
-
-  const addTask = async () => {
-    if (!newTaskText) {
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: newTaskText }),
-      });
-
-      if (response.ok) {
-        setNewTaskText('');
-        fetchTasks(); // Refresh task list
-      } else {
-        console.error('Failed to add task');
-      }
-    } catch (error) {
-      console.error('Error adding task:', error);
-    }
-  };
+  const [newTask, setNewTask] = useState('');
 
   useEffect(() => {
-    fetchTasks();
+    fetch('/api/tasks')
+      .then((response) => response.json())
+      .then((data) => setTasks(data))
+      .catch((error) => console.error('Error fetching tasks:', error));
   }, []);
 
+  const addTask = () => {
+    fetch('/api/tasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: newTask }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setTasks([...tasks, data]);
+        setNewTask('');
+      })
+      .catch((error) => console.error('Error adding task:', error));
+  };
+
   return (
-    <div className="container">
-      <h1>ToDo List</h1>
-      <div className="task-list">
-        {tasks.map((task) => (
-          <Task key={task._id} task={task} />
-        ))}
-      </div>
-      <div className="add-task">
+    <div>
+      <h1>Todo List</h1>
+      <div>
         <input
           type="text"
-          placeholder="Add a new task"
-          value={newTaskText}
-          onChange={(e) => setNewTaskText(e.target.value)}
+          placeholder="New task..."
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
         />
         <button onClick={addTask}>Add</button>
       </div>
+      <ul>
+        {tasks.map((task) => (
+          <li key={task._id}>{task.text}</li>
+        ))}
+      </ul>
     </div>
   );
-};
-
-export default Home;
+}
